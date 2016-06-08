@@ -1,4 +1,4 @@
-package gol;
+package ca.unbc.gol;
 
 import java.awt.Canvas;
 import java.awt.Point;
@@ -14,17 +14,19 @@ import java.awt.event.MouseWheelListener;
  *
  * @author Colin Heathman
  */
-public class Controller {
+class Controller {
 
     private final Game game;
     private final Canvas canvas;
     private final Camera camera;
     
-    public Controller(Game game, Canvas canvas, Camera camera) {
+    private int color = Grid.RED;
+    
+    Controller(Game game) {
         
         this.game = game;
-        this.canvas = canvas;
-        this.camera = camera;
+        this.canvas = game.canvas;
+        this.camera = game.camera;
         
         this.canvas.addMouseListener(new MouseAdapter() {
             
@@ -105,7 +107,7 @@ public class Controller {
     private void paintCells(MouseEvent evt) {
         Point mouse = globalToLocal(evt.getPoint());
         try {
-            game.getUserChangesQueue().put(new UserChange(mouse, Grid.GREEN));
+            game.getUserChangesQueue().put(new UserChange(mouse, color));
         } catch (InterruptedException ex) {
             throw new RuntimeException("User input interupted unexpectedly");
         }
@@ -147,8 +149,24 @@ public class Controller {
     }
     
     private void keyPressedHandler(KeyEvent evt) {
-        if(evt.getKeyCode() == KeyEvent.VK_SPACE) {
-            game.togglePaused();
+        switch (evt.getKeyCode()) {
+            case KeyEvent.VK_SPACE:
+                game.togglePaused();
+                break;
+            case KeyEvent.VK_1:
+                color = Grid.RED;
+                break;
+            case KeyEvent.VK_2:
+                color = Grid.GREEN;
+                break;
+            case KeyEvent.VK_3:
+                color = Grid.BLUE;
+                break;
+            case KeyEvent.VK_4:
+                color = Grid.WHITE;
+                break;
+            default:
+                break;
         }
     }
     

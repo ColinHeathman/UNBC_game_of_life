@@ -1,10 +1,10 @@
-package gol;
+package ca.unbc.gol;
 
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 
 /**
- *
+ * Camera class used to simplify 2D image transformations
  * @author Colin Heathman
  */
 public class Camera {

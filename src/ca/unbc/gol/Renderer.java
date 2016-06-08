@@ -1,6 +1,5 @@
-package gol;
+package ca.unbc.gol;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -8,35 +7,28 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- * @author Colin Heathman
- */
-public class Renderer {
+//Renders the game onto the canvas
+class Renderer {
 
     private static final Font FONT = new Font("Terminal",Font.BOLD,10);
     
     private final Game game;
-    private final Canvas canvas;
     private final BufferStrategy strategy;
     private final BufferedImage image;
-    private final Camera camera;
-        
-    protected final Runnable renderTask;
+            
+    final Runnable renderTask;
     
-    public Renderer(Game game, Canvas canvas, Camera camera) {
+    Renderer(Game game) {
         
         this.renderTask = () -> {update();};
         
         this.game = game;
-        this.canvas = canvas;
-        this.camera = camera;
         
-        this.canvas.createBufferStrategy(2);
-        this.strategy = canvas.getBufferStrategy();
+        game.canvas.createBufferStrategy(2);
+        this.strategy = game.canvas.getBufferStrategy();
         this.image = new BufferedImage(game.getWidth(), game.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
     }
-    
+        
     private void update() {
         updateFPS();
         
@@ -50,7 +42,7 @@ public class Renderer {
                 Graphics2D graphics = (Graphics2D) strategy.getDrawGraphics();
 
                 graphics.setColor(Color.GRAY);
-                graphics.fill(canvas.getBounds());
+                graphics.fill(game.canvas.getBounds());
                 
                 // Blit image
                 for(int y = 0; y < game.getHeight(); y++) {
@@ -60,11 +52,11 @@ public class Renderer {
                 }
                 
                 //Draw image
-                graphics.drawImage(image,camera.getTransform(),canvas);
+                graphics.drawImage(image,game.camera.getTransform(),game.canvas);
                 
                 //Show FPS
                 graphics.setColor(Color.DARK_GRAY);
-                int bottom = canvas.getBounds().height;
+                int bottom = game.canvas.getBounds().height;
                 graphics.fillRect(0, bottom - 20, 75, 15);
                 graphics.setColor(Color.white);
                 graphics.setFont(FONT);

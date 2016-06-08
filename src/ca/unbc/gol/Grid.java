@@ -1,11 +1,17 @@
-package gol;
+package ca.unbc.gol;
 
 import java.awt.Color;
 
+/**
+ * Game grid 
+ */
 public class Grid {
     
-    public static final int DEAD = 0;
+    public static final int DEAD = Color.BLACK.getRGB();
     public static final int GREEN = Color.GREEN.getRGB();
+    public static final int RED = Color.RED.getRGB();
+    public static final int BLUE = Color.BLUE.getRGB();
+    public static final int WHITE = Color.WHITE.getRGB();
     
     private final int[] states;
     private final int width;

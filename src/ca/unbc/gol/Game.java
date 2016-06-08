@@ -1,8 +1,11 @@
-package gol;
+package ca.unbc.gol;
 
+import java.awt.Canvas;
+import java.awt.Container;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -13,6 +16,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Game of Life Game class
+ */
 public class Game extends Thread {
 
     private final int height;
@@ -21,7 +27,6 @@ public class Game extends Thread {
     private ScheduledExecutorService mainExecutor;
     private final long frameDelay;
     private final List<Callable<Object>> tasks;
-    private Runnable updateDisplayTask;
 
     private Grid currentStates;
     private Grid nextStates;
@@ -29,7 +34,12 @@ public class Game extends Thread {
     private boolean paused;
     private boolean togglePause;
     
-    public Game(GameParams params) {
+    final Canvas canvas;
+    final Camera camera;
+    final Controller controller;
+    final Renderer renderer;
+    
+    public Game(GameParams params, Container container) {
         this.height = params.getHeight();
         this.width = params.getWidth();
         this.pool = Executors.newFixedThreadPool(params.getThreads());
@@ -49,6 +59,29 @@ public class Game extends Thread {
         
         for(int i = 0; i < regions.size(); i++) {
             tasks.add(Executors.callable(new GameTask(this, regions.get(i))));
+        }
+        
+        if(params.isRandomized()) {
+            this.randomize(params.getDefaultInitialColor(), params.isRandomInitialColor());
+        }
+        
+        if(params.isVisible()) {
+            
+            this.canvas = new Canvas();
+            canvas.setBounds(0, 0, params.getWidth(), params.getHeight());
+            canvas.setVisible(true);
+            container.add(canvas);
+            
+            this.camera = new Camera();
+            this.renderer = new Renderer(this);
+
+            this.controller = new Controller(this);
+        } else {
+            
+            this.canvas = null;
+            this.camera = null;
+            this.renderer = null;
+            this.controller = null;
         }
     }
     
@@ -73,9 +106,9 @@ public class Game extends Thread {
             
             List<Future> futures = new ArrayList<>();
             //Display grid
-            if(updateDisplayTask != null) {
+            if(renderer != null) {
                 futures.add(
-                    pool.submit(updateDisplayTask)
+                    pool.submit(renderer.renderTask)
                 );
             }
 
@@ -109,6 +142,33 @@ public class Game extends Thread {
         currentStates = swap;
     }
     
+    public void randomize(int color) {
+        this.randomize(color, false);
+    }
+    
+    public void randomize(boolean randomColor) {
+        this.randomize(0, true);
+    }
+    
+    private void randomize(int color, boolean randomColor) {
+        
+        Random rand = new Random();
+        for(int y = 0; y < this.getHeight(); y++) {
+            for(int x = 0; x < this.getWidth(); x++) {
+                if(rand.nextBoolean()) {
+                    if(randomColor) {
+                        this.getCurrentStates().setState(x, y, rand.nextInt());
+                    }
+                    else {
+                        this.getCurrentStates().setState(x, y, color);
+                    }
+                } else {
+                    this.getCurrentStates().setState(x, y, Grid.DEAD);
+                }
+            }
+        }
+    }
+    
     public Grid getCurrentStates() {
         return currentStates;
     }
@@ -125,14 +185,18 @@ public class Game extends Thread {
         return width;
     }
     
-    public void setUpdateDisplayTask(Runnable updateDisplayTask) {
-        this.updateDisplayTask = updateDisplayTask;
-    }
-
     BlockingQueue getUserChangesQueue() {
         return userChangesQueue;
     }
+    
+    public Canvas getCanvas() {
+        return canvas;
+    }
 
+    public Camera getCamera() {
+        return camera;
+    }
+    
     public void togglePaused() {
         togglePause = true;
     }
