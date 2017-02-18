@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Random;
 
 /**
  *
@@ -21,12 +22,15 @@ class Controller {
     private final Camera camera;
     
     private int color = Grid.RED;
+    private Random random;
+    private boolean randomColor = false;
     
     Controller(Game game) {
         
         this.game = game;
         this.canvas = game.canvas;
         this.camera = game.camera;
+        this.random = new Random();
         
         this.canvas.addMouseListener(new MouseAdapter() {
             
@@ -113,7 +117,8 @@ class Controller {
                  && mouse.y >= 0
                  && mouse.y < game.getHeight()
                     ) {
-                game.getUserChangesQueue().put(new UserChange(mouse, color));
+                if(randomColor) game.getUserChangesQueue().put(new UserChange(mouse, random.nextInt()));
+                else            game.getUserChangesQueue().put(new UserChange(mouse, color));
             }
         } catch (InterruptedException ex) {
             throw new RuntimeException("User input interupted unexpectedly");
@@ -161,19 +166,27 @@ class Controller {
                 game.togglePaused();
                 break;
             case KeyEvent.VK_1:
+                randomColor = false;
                 color = Grid.RED;
                 break;
             case KeyEvent.VK_2:
+                randomColor = false;
                 color = Grid.GREEN;
                 break;
             case KeyEvent.VK_3:
+                randomColor = false;
                 color = Grid.BLUE;
                 break;
             case KeyEvent.VK_4:
+                randomColor = false;
                 color = Grid.WHITE;
                 break;
             case KeyEvent.VK_5:
+                randomColor = false;
                 color = Grid.DEAD;
+                break;
+            case KeyEvent.VK_6:
+                randomColor = true;
                 break;
             case KeyEvent.VK_R:
                 //Randomize
@@ -193,6 +206,15 @@ class Controller {
      * @return Current selected color
      */
     public int getColor() {
-        return color;
+        if(randomColor) return random.nextInt();
+        else            return color;
+    }
+    
+    /**
+     * 
+     * @return If the color will be random
+     */
+    public boolean randomColor() {
+        return randomColor;
     }
 }

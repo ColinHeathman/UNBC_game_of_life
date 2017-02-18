@@ -62,35 +62,44 @@ class Renderer {
                 graphics.setFont(FONT);
                 
                 graphics.setColor(Color.RED);
-                if(game.controller.getColor() == Grid.RED) {
+                if(!game.controller.randomColor() && game.controller.getColor() == Grid.RED) {
                     graphics.drawString("( 1 - Red )", 10, bottom - 10);
                 } else {
                     graphics.drawString("  1 - Red  ", 10, bottom - 10);
                 }
                 graphics.setColor(Color.GREEN);
-                if(game.controller.getColor() == Grid.GREEN) {
+                if(!game.controller.randomColor() && game.controller.getColor() == Grid.GREEN) {
                     graphics.drawString("(2 - Green)", 70, bottom - 10);
                 } else {
                     graphics.drawString(" 2 - Green ", 70, bottom - 10);
                 }
                 graphics.setColor(Color.BLUE);
-                if(game.controller.getColor() == Grid.BLUE) {
+                if(!game.controller.randomColor() && game.controller.getColor() == Grid.BLUE) {
                     graphics.drawString("(3 - Blue )", 130, bottom - 10);
                 } else {
                     graphics.drawString(" 3 - Blue  ", 130, bottom - 10);
                 }
                 graphics.setColor(Color.WHITE);
-                if(game.controller.getColor() == Grid.WHITE) {
+                if(!game.controller.randomColor() && game.controller.getColor() == Grid.WHITE) {
                     graphics.drawString("(4 - White)", 190, bottom - 10);
                 } else {
                     graphics.drawString(" 4 - White ", 190, bottom - 10);
                 }
                 graphics.setColor(Color.BLACK);
-                if(game.controller.getColor() == Grid.DEAD) {
+                if(!game.controller.randomColor() && game.controller.getColor() == Grid.DEAD) {
                     graphics.drawString("(5 - Black)", 250, bottom - 10);
                 } else {
                     graphics.drawString(" 5 - Black ", 250, bottom - 10);
                 }
+                if(game.controller.randomColor()) {
+                    graphics.setColor(new Color(game.controller.getColor()));
+                    graphics.drawString("(6 - Random)", 310, bottom - 10);
+                } else {
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(" 6 - Random ", 310, bottom - 10);
+                }
+                      
+                
                 
                 graphics.setColor(Color.white);
                 StringBuilder statusString = new StringBuilder();
@@ -99,7 +108,7 @@ class Renderer {
                 statusString.append(" [Space] pause ");
                 statusString.append("  FPS: ").append(String.format("%.3g%n", FrameRate));
                 
-                graphics.drawString(statusString.toString(), 310, bottom - 10);
+                graphics.drawString(statusString.toString(), 375, bottom - 10);
                 
                 
                                 
