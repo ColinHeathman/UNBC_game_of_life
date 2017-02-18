@@ -54,14 +54,55 @@ class Renderer {
                 //Draw image
                 graphics.drawImage(image,game.camera.getTransform(),game.canvas);
                 
-                //Show FPS
+                //Draw controls
                 graphics.setColor(Color.DARK_GRAY);
                 int bottom = game.canvas.getBounds().height;
-                graphics.fillRect(0, bottom - 20, 75, 15);
-                graphics.setColor(Color.white);
+                int right = game.canvas.getBounds().width;
+                graphics.fillRect(0, bottom - 20, right, 15);
                 graphics.setFont(FONT);
-                graphics.drawString("FPS: " + String.format("%.3g%n", FrameRate), 10, bottom - 10);
                 
+                graphics.setColor(Color.RED);
+                if(game.controller.getColor() == Grid.RED) {
+                    graphics.drawString("( 1 - Red )", 10, bottom - 10);
+                } else {
+                    graphics.drawString("  1 - Red  ", 10, bottom - 10);
+                }
+                graphics.setColor(Color.GREEN);
+                if(game.controller.getColor() == Grid.GREEN) {
+                    graphics.drawString("(2 - Green)", 70, bottom - 10);
+                } else {
+                    graphics.drawString(" 2 - Green ", 70, bottom - 10);
+                }
+                graphics.setColor(Color.BLUE);
+                if(game.controller.getColor() == Grid.BLUE) {
+                    graphics.drawString("(3 - Blue )", 130, bottom - 10);
+                } else {
+                    graphics.drawString(" 3 - Blue  ", 130, bottom - 10);
+                }
+                graphics.setColor(Color.WHITE);
+                if(game.controller.getColor() == Grid.WHITE) {
+                    graphics.drawString("(4 - White)", 190, bottom - 10);
+                } else {
+                    graphics.drawString(" 4 - White ", 190, bottom - 10);
+                }
+                graphics.setColor(Color.BLACK);
+                if(game.controller.getColor() == Grid.DEAD) {
+                    graphics.drawString("(5 - Black)", 250, bottom - 10);
+                } else {
+                    graphics.drawString(" 5 - Black ", 250, bottom - 10);
+                }
+                
+                graphics.setColor(Color.white);
+                StringBuilder statusString = new StringBuilder();
+                statusString.append(" [R]andomize   ");
+                statusString.append(" [C]lear       ");
+                statusString.append(" [Space] pause ");
+                statusString.append("  FPS: ").append(String.format("%.3g%n", FrameRate));
+                
+                graphics.drawString(statusString.toString(), 310, bottom - 10);
+                
+                
+                                
                 // Dispose the graphics
                 graphics.dispose();
 

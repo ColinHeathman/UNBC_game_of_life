@@ -14,7 +14,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Game of Life Game class
@@ -33,6 +36,7 @@ public class Game extends Thread {
     private final BlockingQueue<UserChange> userChangesQueue;
     private boolean paused;
     private boolean togglePause;
+    private final Semaphore gameLock;
     
     final Canvas canvas;
     final Camera camera;
@@ -48,6 +52,7 @@ public class Game extends Thread {
         currentStates = new Grid(width, height);
         nextStates = new Grid(width, height);
         userChangesQueue = new LinkedBlockingQueue();
+        gameLock = new Semaphore(1);
         paused = false;
         
         List<Rectangle> regions = Util.subdivideArea(
@@ -68,7 +73,6 @@ public class Game extends Thread {
         if(params.isVisible()) {
             
             this.canvas = new Canvas();
-            canvas.setBounds(0, 0, params.getWidth(), params.getHeight());
             canvas.setVisible(true);
             container.add(canvas);
             
@@ -76,6 +80,8 @@ public class Game extends Thread {
             this.renderer = new Renderer(this);
 
             this.controller = new Controller(this);
+            container.setSize(params.getWidth(), params.getHeight());
+            container.requestFocus();
         } else {
             
             this.canvas = null;
@@ -98,6 +104,9 @@ public class Game extends Thread {
                 togglePause = false;
                 paused = !paused;
             }
+            
+            gameLock.acquire();
+            
             //Apply any user changes
             while(!userChangesQueue.isEmpty()) {
                 UserChange change = userChangesQueue.take();
@@ -128,6 +137,7 @@ public class Game extends Thread {
             //Swap grids
             if(!paused) swapGrid();
             
+            gameLock.release();
             
         } catch(InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -152,6 +162,11 @@ public class Game extends Thread {
     
     private void randomize(int color, boolean randomColor) {
         
+        try {
+            gameLock.acquire();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Random rand = new Random();
         for(int y = 0; y < this.getHeight(); y++) {
             for(int x = 0; x < this.getWidth(); x++) {
@@ -167,6 +182,21 @@ public class Game extends Thread {
                 }
             }
         }
+        gameLock.release();
+    }
+    
+    public void clear() {
+        try {
+            gameLock.acquire();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        for(int y = 0; y < this.getHeight(); y++) {
+            for(int x = 0; x < this.getWidth(); x++) {
+                this.getCurrentStates().setState(x, y, Grid.DEAD);
+            }
+        }
+        gameLock.release();
     }
     
     public Grid getCurrentStates() {

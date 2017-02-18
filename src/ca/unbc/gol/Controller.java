@@ -107,7 +107,14 @@ class Controller {
     private void paintCells(MouseEvent evt) {
         Point mouse = globalToLocal(evt.getPoint());
         try {
-            game.getUserChangesQueue().put(new UserChange(mouse, color));
+            if(
+                    mouse.x >= 0
+                 && mouse.x < game.getWidth()
+                 && mouse.y >= 0
+                 && mouse.y < game.getHeight()
+                    ) {
+                game.getUserChangesQueue().put(new UserChange(mouse, color));
+            }
         } catch (InterruptedException ex) {
             throw new RuntimeException("User input interupted unexpectedly");
         }
@@ -165,9 +172,27 @@ class Controller {
             case KeyEvent.VK_4:
                 color = Grid.WHITE;
                 break;
+            case KeyEvent.VK_5:
+                color = Grid.DEAD;
+                break;
+            case KeyEvent.VK_R:
+                //Randomize
+                game.randomize(true);
+                break;
+            case KeyEvent.VK_C:
+                //Clear
+                game.clear();
+                break;
             default:
                 break;
         }
     }
     
+    /**
+     * 
+     * @return Current selected color
+     */
+    public int getColor() {
+        return color;
+    }
 }

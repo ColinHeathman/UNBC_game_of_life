@@ -81,8 +81,8 @@ public class Main {
         
         JFrame frame = new JFrame("Game Of Life Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setBounds(0, 0, params.getWidth(), params.getHeight());
         frame.setVisible(true);
+//        frame.setSize(params.getWidth(), params.getHeight());
         
         Game game = new Game(params, frame);
         
